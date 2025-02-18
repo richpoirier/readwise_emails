@@ -45,8 +45,17 @@ async function convertToPdf(highlights) {
         doc.fontSize(12)
           .font('Helvetica')
           .text(highlight.text, {
-            paragraphGap: 20
+            paragraphGap: highlight.note ? 10 : 20
           });
+
+        // Add note if present
+        if (highlight.note) {
+          doc.fontSize(11)
+            .font('Helvetica-Oblique')
+            .text(`Note: ${highlight.note}`, {
+              paragraphGap: 20
+            });
+        }
 
         // Add some space between highlights
         doc.moveDown(2);

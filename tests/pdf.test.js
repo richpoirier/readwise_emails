@@ -31,7 +31,8 @@ describe('PDF Generation', () => {
     const highlights = [{
       title: 'Test Book',
       author: 'Test Author',
-      text: 'Test highlight'
+      text: 'Test highlight',
+      note: 'Test note'
     }];
 
     // Set up the data event handler
@@ -62,7 +63,12 @@ describe('PDF Generation', () => {
         
     expect(mockDoc.fontSize).toHaveBeenCalledWith(12);
     expect(mockDoc.font).toHaveBeenCalledWith('Helvetica');
-    expect(mockDoc.text).toHaveBeenCalledWith('Test highlight', { paragraphGap: 20 });
+    expect(mockDoc.text).toHaveBeenCalledWith('Test highlight', { paragraphGap: 10 });
+
+    // Verify note formatting
+    expect(mockDoc.fontSize).toHaveBeenCalledWith(11);
+    expect(mockDoc.font).toHaveBeenCalledWith('Helvetica-Oblique');
+    expect(mockDoc.text).toHaveBeenCalledWith('Note: Test note', { paragraphGap: 20 });
         
     // Verify PDF was finalized
     expect(mockDoc.end).toHaveBeenCalled();
@@ -96,12 +102,14 @@ describe('PDF Generation', () => {
       {
         title: 'Book 1',
         author: 'Author 1',
-        text: 'Highlight 1'
+        text: 'Highlight 1',
+        note: 'Note 1'
       },
       {
         title: 'Book 2',
         author: 'Author 2',
-        text: 'Highlight 2'
+        text: 'Highlight 2',
+        note: 'Note 2'
       }
     ];
 
@@ -118,14 +126,42 @@ describe('PDF Generation', () => {
     // Verify both highlights were added
     expect(mockDoc.text).toHaveBeenCalledWith('Book 1', { underline: true });
     expect(mockDoc.text).toHaveBeenCalledWith('Author 1', { paragraphGap: 10 });
-    expect(mockDoc.text).toHaveBeenCalledWith('Highlight 1', { paragraphGap: 20 });
+    expect(mockDoc.text).toHaveBeenCalledWith('Highlight 1', { paragraphGap: 10 });
+    expect(mockDoc.text).toHaveBeenCalledWith('Note: Note 1', { paragraphGap: 20 });
         
     expect(mockDoc.text).toHaveBeenCalledWith('Book 2', { underline: true });
     expect(mockDoc.text).toHaveBeenCalledWith('Author 2', { paragraphGap: 10 });
-    expect(mockDoc.text).toHaveBeenCalledWith('Highlight 2', { paragraphGap: 20 });
+    expect(mockDoc.text).toHaveBeenCalledWith('Highlight 2', { paragraphGap: 10 });
+    expect(mockDoc.text).toHaveBeenCalledWith('Note: Note 2', { paragraphGap: 20 });
         
     // Verify spacing between highlights
     expect(mockDoc.moveDown).toHaveBeenCalledTimes(2);
+  });
+
+  it('should handle highlights without notes', async () => {
+    const highlights = [{
+      title: 'Test Book',
+      author: 'Test Author',
+      text: 'Test highlight'
+    }];
+
+    mockDoc.on.mockImplementation((event, callback) => {
+      if (event === 'data') {
+        callback(Buffer.from('test'));
+      } else if (event === 'end') {
+        callback();
+      }
+    });
+
+    await convertToPdf(highlights);
+
+    // Verify highlight without note
+    expect(mockDoc.text).toHaveBeenCalledWith('Test Book', { underline: true });
+    expect(mockDoc.text).toHaveBeenCalledWith('Test Author', { paragraphGap: 10 });
+    expect(mockDoc.text).toHaveBeenCalledWith('Test highlight', { paragraphGap: 20 });
+    
+    // Verify note was not added
+    expect(mockDoc.text).not.toHaveBeenCalledWith(expect.stringMatching(/^Note:/), expect.any(Object));
   });
 
   it('should handle PDF generation errors', async () => {
