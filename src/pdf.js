@@ -45,7 +45,7 @@ async function convertToPdf(highlights) {
         doc.fontSize(12)
           .font('Helvetica')
           .text(highlight.text, {
-            paragraphGap: highlight.note ? 10 : 20
+            paragraphGap: highlight.note ? 10 : 10
           });
 
         // Add note if present
@@ -53,9 +53,18 @@ async function convertToPdf(highlights) {
           doc.fontSize(11)
             .font('Helvetica-Oblique')
             .text(`Note: ${highlight.note}`, {
-              paragraphGap: 20
+              paragraphGap: 10
             });
         }
+
+        // Add delete link
+        doc.fontSize(10)
+          .fillColor('#0000EE')
+          .text('Delete highlight', {
+            link: `${process.env.DELETE_PROXY_URL || 'http://localhost:3000'}/delete-highlight/${highlight.id}/`,
+            paragraphGap: 20,
+            underline: true
+          });
 
         // Add some space between highlights
         doc.moveDown(2);
