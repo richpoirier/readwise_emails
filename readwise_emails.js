@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const { getHighlights } = require('./src/readwise');
 const { convertToPdf } = require('./src/pdf');
-const { sendEmailViaSendgrid } = require('./src/email');
+const { sendEmail } = require('./src/email');
 
 // Validate required environment variables
 const requiredEnvVars = ['SENDGRID_API_KEY', 'READWISE_AUTH_TOKEN', 'KINDLE_EMAIL', 'FROM_EMAIL'];
@@ -31,7 +31,7 @@ async function main() {
         // Create the PDF filename with today's date
         const pdfFilename = `Readwise Daily Highlights - ${formattedDate}.pdf`;
 
-        await sendEmailViaSendgrid(pdf, pdfFilename);
+        await sendEmail(pdf, pdfFilename);
         console.log('Email sent successfully');
     } catch (error) {
         console.error('Error in main function:', error);

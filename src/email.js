@@ -1,6 +1,6 @@
 const sgMail = require('@sendgrid/mail');
 
-async function sendEmailViaSendgrid(pdf, pdfFilename) {
+async function sendEmail(pdf, pdfFilename) {
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
   const attachments = [
@@ -30,5 +30,5 @@ async function sendEmailViaSendgrid(pdf, pdfFilename) {
 }
 
 module.exports = {
-  sendEmailViaSendgrid
+  sendEmail
 }; 

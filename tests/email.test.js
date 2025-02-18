@@ -1,45 +1,50 @@
+const { sendEmail } = require('../src/email');
 const sgMail = require('@sendgrid/mail');
-const { sendEmailViaSendgrid } = require('../src/email');
 
 // Mock @sendgrid/mail
 jest.mock('@sendgrid/mail');
 
-describe('Email Functionality', () => {
+describe('Email Sending', () => {
   beforeEach(() => {
-    // Clear all mocks before each test
+    process.env.SENDGRID_API_KEY = 'test-key';
+    process.env.KINDLE_EMAIL = 'test@kindle.com';
+    process.env.FROM_EMAIL = 'from@test.com';
+  });
+
+  afterEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('sendEmailViaSendgrid', () => {
-    const mockPdf = Buffer.from('test pdf content');
-    const mockFilename = 'test.pdf';
+  it('should send email with PDF attachment', async () => {
+    const pdf = Buffer.from('test pdf content');
+    const filename = 'test.pdf';
 
-    it('should send email with correct parameters', async () => {
-      sgMail.send.mockResolvedValueOnce([{ statusCode: 202 }]);
+    sgMail.send.mockResolvedValue(true);
 
-      await sendEmailViaSendgrid(mockPdf, mockFilename);
+    const result = await sendEmail(pdf, filename);
 
-      expect(sgMail.setApiKey).toHaveBeenCalledWith('test_sendgrid_key');
-      expect(sgMail.send).toHaveBeenCalledWith({
-        to: 'test@kindle.com',
-        from: 'test@example.com',
-        subject: 'Readwise Highlights',
-        text: 'Readwise Highlights',
-        attachments: [{
-          content: mockPdf.toString('base64'),
-          filename: mockFilename,
-          type: 'application/pdf',
-          disposition: 'attachment',
-        }]
-      });
+    expect(sgMail.setApiKey).toHaveBeenCalledWith('test-key');
+    expect(sgMail.send).toHaveBeenCalledWith({
+      to: 'test@kindle.com',
+      from: 'from@test.com',
+      subject: 'Readwise Highlights',
+      text: 'Readwise Highlights',
+      attachments: [{
+        content: pdf.toString('base64'),
+        filename: filename,
+        type: 'application/pdf',
+        disposition: 'attachment'
+      }]
     });
+    expect(result).toBe(true);
+  });
 
-    it('should handle SendGrid errors', async () => {
-      const errorMessage = 'SendGrid Error';
-      sgMail.send.mockRejectedValueOnce(new Error(errorMessage));
+  it('should handle SendGrid errors', async () => {
+    const pdf = Buffer.from('test pdf content');
+    const filename = 'test.pdf';
 
-      await expect(sendEmailViaSendgrid(mockPdf, mockFilename))
-        .rejects.toThrow(errorMessage);
-    });
+    sgMail.send.mockRejectedValue(new Error('SendGrid Error'));
+
+    await expect(sendEmail(pdf, filename)).rejects.toThrow('SendGrid Error');
   });
 }); 
