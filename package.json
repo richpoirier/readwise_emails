@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.4",
+    "axios": "^1.7.9",
+    "nodemailer": "^6.10.0",
+    "puppeteer": "^21.11.0",
+    "dotenv": "^16.4.1"
+  }
+}
