@@ -1,0 +1,17 @@
+{
+  "rules": [
+    {
+      "name": "Run tests after changes",
+      "description": "Automatically runs Jest tests when JavaScript files are changed",
+      "events": ["file_changed"],
+      "pattern": "**/*.js",
+      "exclude_pattern": "node_modules/**",
+      "commands": [
+        {
+          "command": "npm test",
+          "auto_approve": true
+        }
+      ]
+    }
+  ]
+} 

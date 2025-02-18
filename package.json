@@ -1,9 +1,26 @@
 {
+  "name": "readwise-emails",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node readwise_emails.js",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
   "dependencies": {
     "@sendgrid/mail": "^8.1.4",
     "axios": "^1.7.9",
+    "dotenv": "^16.4.1",
     "nodemailer": "^6.10.0",
-    "puppeteer": "^21.11.0",
-    "dotenv": "^16.4.1"
+    "pdfkit": "^0.16.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-node": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "setupFiles": [
+      "<rootDir>/tests/setup.js"
+    ]
   }
 }
